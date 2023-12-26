@@ -71,6 +71,9 @@ public class Game : MonoBehaviour
         SetPieceAt(file, rank, piece);
     }
 
+    // Triggered when a Piece tries to move.
+    // checks legality, then handles special moves
+    // then performs move and updates board
     private void OnPieceTriedMove(Piece piece, int toRank, int toFile)
     {
         Debug.Log("Piece tried move");
@@ -274,7 +277,8 @@ public class Game : MonoBehaviour
 
         return KingMoveType.Illegal;
     }
-
+    
+    // determines whether a space can be attacked
     private bool IsSpaceThreatened(int file, int rank, Piece.Color color, Piece[,] board = null)
     {
         board ??= _currentBoard;
@@ -292,6 +296,8 @@ public class Game : MonoBehaviour
         return false;
     }
 
+    // determines whether any pieces are on the squares between [file, rank] and [toFile, toRank]
+    // works for horizontal, vertical and diagonal moves
     private bool PathIsClear(int rank, int file, int toRank, int toFile)
     {
         int deltaRank = toRank - rank;
