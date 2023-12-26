@@ -120,6 +120,13 @@ public class Game : MonoBehaviour
                     SetPieceAt(new_rook_file, piece.rank, castling_rook);
                     SetPieceAt(castling_rook.file, castling_rook.rank, null);
                 }
+                if (king_move_type == KingMoveType.CastleFile8)
+                {
+                    Piece castling_rook = GetPieceAt(8, piece.rank);
+                    var new_rook_file = piece.file + Math.Sign(to_file - piece.file);
+                    SetPieceAt(new_rook_file, piece.rank, castling_rook);
+                    SetPieceAt(castling_rook.file, castling_rook.rank, null);
+                }
                 break;
             case Piece.PieceType.Queen:
                 legal &= IsLegalQueenMove(piece, to_rank, to_file);
@@ -242,6 +249,8 @@ public class Game : MonoBehaviour
                 }
                 break;
         }
+
+        return legal;
     }
 
     private bool IsOnBoard(int to_rank, int to_file)
@@ -262,45 +271,84 @@ public class Game : MonoBehaviour
         Illegal
     }
 
-    private KingMoveType IsLegalKingMove(Piece piece, int to_rank, int to_file)
+    private KingMoveType IsLegalKingMove(Piece king, int to_rank, int to_file)
     {
-        var delta_rank = to_rank - piece.rank;
-        var delta_file = to_file - piece.file;
-        var king_move_type = KingMoveType.Illegal;
+        var delta_rank = to_rank - king.rank;
+        var delta_file = to_file - king.file;
         if (Math.Abs(delta_rank) <= 1 && Math.Abs(delta_file) <= 1)
         {
-            king_move_type = KingMoveType.Normal;
+            return KingMoveType.Normal;
         }
 
-        bool isTwoFileStepDown = delta_file == 2 && delta_rank == 0;
-        bool king_or_rook_has_moved = false;
+        // check for castling
+        bool isTwoFileStepDown = delta_file == -2 && delta_rank == 0;
+        bool isTwoFileStepUp = delta_file == 2 && delta_rank == 0;
+
+        int rook_file;
+        if (isTwoFileStepDown)
+        {
+            rook_file = 1;
+        }
+        else if (isTwoFileStepUp)
+        {
+            rook_file = 8;
+        }
+        else
+        {
+            return KingMoveType.Illegal;
+        }
+
+        Piece rook = GetPieceAt(rook_file, king.rank);
+        if (rook == null || rook.pieceType != Piece.PieceType.Rook || rook.color != king.color) 
+        {
+            return KingMoveType.Illegal;
+        }
+        
+        // traverse history to check that king and rook have not moved
+        bool king_has_moved = false;
+        bool rook_has_moved = false;
         for (int i = board_history.Count - 1; i >= 0; i--)
         {
-            var rook_spot_piece = GetPieceAt(1, piece.rank, board_history[i]);
-            var king_spot_piece = GetPieceAt(piece.rank, piece.file, board_history[i]);
-            if (rook_spot_piece == null
-                || !(rook_spot_piece.pieceType == Piece.PieceType.Rook 
-                     && rook_spot_piece.color == piece.color)
-                || king_spot_piece != piece)
+            var rook_spot_piece = GetPieceAt(rook_file, king.rank, board_history[i]);
+            var king_spot_piece = GetPieceAt( king.file, king.rank, board_history[i]);
+            if (rook_spot_piece == null || rook_spot_piece != rook)
             {
-                king_or_rook_has_moved = true;
+                rook_has_moved = true;
+                break;
+            }
+            if (king_spot_piece == null || king_spot_piece != king)
+            {
+                king_has_moved = true;
                 break;
             }
         }
 
-        bool king_in_check = false;
-        bool path_has_check = false;
+        bool king_in_check = IsSpaceThreatened(king.file, king.rank, king.color);
+        bool path_has_check = IsSpaceThreatened(king.file + Math.Sign(delta_file), king.rank, king.color);
         bool path_is_clear = true;
 
-        return king_move_type;
+        if (!rook_has_moved
+            && !king_has_moved
+            && !king_in_check
+            && !path_has_check
+            && path_is_clear)
+        {
+            return isTwoFileStepDown ? KingMoveType.CastleFile1 : KingMoveType.CastleFile8;
+        }
+
+        return KingMoveType.Illegal;
     }
 
-    private bool IsKingInCheck(Piece king, Piece[,] board = null)
+    private bool IsSpaceThreatened(int file, int rank, Piece.Color color, Piece[,] board = null)
     {
         if (board == null) board = current_board;
         foreach (Piece piece in board)
         {
-            if (IsLegalMove(piece, king.rank, king.file))
+            if (piece == null || piece.color == color)
+            {
+                continue;
+            }
+            if (IsLegalMove(piece, rank, file))
             {
                 return true;
             }
