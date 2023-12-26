@@ -100,22 +100,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19c2dfd05587d4022b49e54279d22e10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  white_king: {fileID: -3792998861040722889, guid: fab06f75d8d514a8993c5637fbedbf2b, type: 3}
-  white_queen: {fileID: 7270707491364550308, guid: 8f2145f9f3350435ab327e93acfded46, type: 3}
-  white_bishop: {fileID: 7560534232159598683, guid: 70b581be470914092a7eae9798aa5a2c, type: 3}
-  white_knight: {fileID: 8769669200613306614, guid: a4e7dd54905d840ee87e60a063dd0ed3, type: 3}
-  white_rook: {fileID: -8948728166497563328, guid: b8c0967771fb54ec69002cf9bd7749ab, type: 3}
-  white_pawn: {fileID: 5580225292014371162, guid: 347cffed5aa07440ea8b3f1497965d35, type: 3}
-  black_king: {fileID: -641104846605737351, guid: 42d4b2b660451487eabd5af1a0df8204, type: 3}
-  black_queen: {fileID: -2628853326628446179, guid: c6eeffd00c2ce4f2abda85204f5d683a, type: 3}
-  black_bishop: {fileID: -6414592721767173361, guid: 2fb97500a4afe454eacc114844ca4dfa, type: 3}
-  black_knight: {fileID: -334450713805299198, guid: 4b350212cd97e438d9f775aa2cc7ff40, type: 3}
-  black_rook: {fileID: -7587791273309554880, guid: 55178f36c9be94a45b5ddf83c9c3272c, type: 3}
-  black_pawn: {fileID: -4341603147912474925, guid: 9ce4d67c1fd8944c0a6792f8abc23bbf, type: 3}
-  pieceType: 0
-  color: 0
-  rank: 0
-  file: 0
+  whiteKing: {fileID: -3792998861040722889, guid: fab06f75d8d514a8993c5637fbedbf2b, type: 3}
+  whiteQueen: {fileID: 7270707491364550308, guid: 8f2145f9f3350435ab327e93acfded46, type: 3}
+  whiteBishop: {fileID: 7560534232159598683, guid: 70b581be470914092a7eae9798aa5a2c, type: 3}
+  whiteKnight: {fileID: 8769669200613306614, guid: a4e7dd54905d840ee87e60a063dd0ed3, type: 3}
+  whiteRook: {fileID: -8948728166497563328, guid: b8c0967771fb54ec69002cf9bd7749ab, type: 3}
+  whitePawn: {fileID: 5580225292014371162, guid: 347cffed5aa07440ea8b3f1497965d35, type: 3}
+  blackKing: {fileID: -641104846605737351, guid: 42d4b2b660451487eabd5af1a0df8204, type: 3}
+  blackQueen: {fileID: -2628853326628446179, guid: c6eeffd00c2ce4f2abda85204f5d683a, type: 3}
+  blackBishop: {fileID: -6414592721767173361, guid: 2fb97500a4afe454eacc114844ca4dfa, type: 3}
+  blackKnight: {fileID: -334450713805299198, guid: 4b350212cd97e438d9f775aa2cc7ff40, type: 3}
+  blackRook: {fileID: -7587791273309554880, guid: 55178f36c9be94a45b5ddf83c9c3272c, type: 3}
+  blackPawn: {fileID: -4341603147912474925, guid: 9ce4d67c1fd8944c0a6792f8abc23bbf, type: 3}
 --- !u!61 &9010247726475957435
 BoxCollider2D:
   m_ObjectHideFlags: 0

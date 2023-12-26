@@ -241,9 +241,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0172abb7775ff4285963ab6af2e9f5cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  piece_o: {fileID: 8362722896555101560, guid: a76df6d89ebd441aab386dd7f0d9c341, type: 3}
-  currentPlayer: {r: 0, g: 0, b: 0, a: 0}
-  piece_move_sound: {fileID: 1347789724}
+  pieceObject: {fileID: 8362722896555101560, guid: a76df6d89ebd441aab386dd7f0d9c341, type: 3}
+  pieceMoveSound: {fileID: 1347789724}
 --- !u!4 &1347789723
 Transform:
   m_ObjectHideFlags: 0

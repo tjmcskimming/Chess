@@ -1,24 +1,25 @@
 using System;
 using UnityEngine;
+using Debug = System.Diagnostics.Debug;
 
 public class Piece : MonoBehaviour
 {
+    // Used to set the sprite within Unity
     public Sprite 
-        white_king,
-        white_queen,
-        white_bishop,
-        white_knight,
-        white_rook,
-        white_pawn,
-        black_king,
-        black_queen,
-        black_bishop,
-        black_knight,
-        black_rook,
-        black_pawn;
+        whiteKing,
+        whiteQueen,
+        whiteBishop,
+        whiteKnight,
+        whiteRook,
+        whitePawn,
+        blackKing,
+        blackQueen,
+        blackBishop,
+        blackKnight,
+        blackRook,
+        blackPawn;
     
-    
-    public enum PieceType
+    public enum Type
     {
         King,
         Queen,
@@ -34,110 +35,91 @@ public class Piece : MonoBehaviour
         White
     }
     
-    public PieceType pieceType;
-    public Color color;
-    public int rank;
-    public int file;
-    public Action<Piece, int, int> TryMove;
-    public AudioSource piece_move_sound;
+    public Type PieceType { get; private set; }
+    public Color PieceColor { get; private set; }
+    public int Rank { get; private set; }
+    public int File { get; private set; }
+    public Action<Piece, int, int> TryMove; // Triggered when a player tries a move
+   
+    // Initialise a new piece, called at beginning and on Pawn promotion
+    public void Activate(Type pieceType, Color pieceColor, int startRank, int startFile)
+    {
+        PieceType = pieceType;
+        PieceColor = pieceColor;
+        GetComponent<SpriteRenderer>().sprite = SelectSprite();
+        SetRankAndFile(startRank, startFile);
+    }
     
-    public void Activate(PieceType pieceType, Color color, int rank, int file)
+    public void SetRankAndFile(int newRank, int newFile)
     {
-        this.pieceType = pieceType;
-        this.color = color;
-        GetComponent<SpriteRenderer>().sprite = InitSprite();
-        SetRankAndFile(rank, file);
+        Rank = newRank;
+        File = newFile;
+        transform.position = new Vector3(newFile, newRank, -1);
     }
 
-    public void SetRankAndFile(int rank, int file)
+    // Chooses a sprite from Sprites based on Type and Color
+    private Sprite SelectSprite()
     {
-        this.rank = rank;
-        this.file = file;
-        transform.position = new Vector3(file, rank, -1);
-    }
-
-    Sprite InitSprite()
-    {
-        Sprite sprite = black_king;
-        switch (color)
+        Sprite sprite = blackKing;
+        switch (PieceColor)
         {
             case Color.White:
-                switch (this.pieceType)
+                sprite = PieceType switch
                 {
-                    case PieceType.King:
-                        sprite = white_king;
-                        break;
-                    case PieceType.Queen:
-                        sprite = white_queen;
-                        break;
-                    case PieceType.Bishop:
-                        sprite = white_bishop;
-                        break;
-                    case PieceType.Knight:
-                        sprite = white_knight;
-                        break;
-                    case PieceType.Rook:
-                        sprite = white_rook;
-                        break;
-                    case PieceType.Pawn:
-                        sprite = white_pawn;
-                        break;
-                }
+                    Type.King => whiteKing,
+                    Type.Queen => whiteQueen,
+                    Type.Bishop => whiteBishop,
+                    Type.Knight => whiteKnight,
+                    Type.Rook => whiteRook,
+                    Type.Pawn => whitePawn,
+                    _ => sprite
+                };
                 break;
             case Color.Black:
-                switch (this.pieceType)
+                sprite = PieceType switch
                 {
-                    case PieceType.King:
-                        sprite = black_king;
-                        break;
-                    case PieceType.Queen:
-                        sprite = black_queen;
-                        break;
-                    case PieceType.Bishop:
-                        sprite = black_bishop;
-                        break;
-                    case PieceType.Knight:
-                        sprite = black_knight;
-                        break;
-                    case PieceType.Rook:
-                        sprite = black_rook;
-                        break;
-                    case PieceType.Pawn:
-                        sprite = black_pawn;
-                        break;
-                }
+                    Type.King => blackKing,
+                    Type.Queen => blackQueen,
+                    Type.Bishop => blackBishop,
+                    Type.Knight => blackKnight,
+                    Type.Rook => blackRook,
+                    Type.Pawn => blackPawn,
+                    _ => sprite
+                };
                 break;
         }
         return sprite;
     }
-
-
-    void OnMouseDown()
+    
+    private void OnMouseDown()
     {
-        var pos = transform.position;
-        Vector3 clicked_screen_coord = Camera.main.WorldToScreenPoint(pos);
-        screen_zCoordinate = clicked_screen_coord.z;
+        Vector3 pos = transform.position;
+        Debug.Assert(Camera.main != null, "Camera.main != null");
+        Vector3 clickedScreenCoordinates = Camera.main.WorldToScreenPoint(pos);
+        _screenZCoordinate = clickedScreenCoordinates.z;
     }
 
-    float screen_zCoordinate;
-    Vector3 GetMouseWorldPos()
+    private float _screenZCoordinate;
+
+    private Vector3 GetMouseWorldPos()
     {
         Vector3 mousePoint = Input.mousePosition;
-        mousePoint.z = screen_zCoordinate - 1;
+        mousePoint.z = _screenZCoordinate - 1;
+        Debug.Assert(Camera.main != null, "Camera.main != null");
         return Camera.main.ScreenToWorldPoint(mousePoint);
     }
 
-    void OnMouseDrag()
+    private void OnMouseDrag()
     {
         transform.position = GetMouseWorldPos();
     }
 
-    void OnMouseUp()
+    private void OnMouseUp()
     {
-        var mouse_pos_w = GetMouseWorldPos();
-        int new_file = (int)Math.Round(mouse_pos_w.x);
-        int new_rank = (int)Math.Round(mouse_pos_w.y);
-        TryMove.Invoke(this, new_rank, new_file);
+        Vector3 mousePosW = GetMouseWorldPos();
+        int newFile = (int)Math.Round(mousePosW.x);
+        int newRank = (int)Math.Round(mousePosW.y);
+        TryMove?.Invoke(this, newRank, newFile);
     }
     
 }

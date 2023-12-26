@@ -6,70 +6,64 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
-    public GameObject piece_o; // TODO, this is wierd I don't know why I have to do this
-    private Piece.Color currentPlayer;
-    [SerializeField] private AudioSource piece_move_sound;
-    private List<Piece[,]> board_history = new();
-    private Piece[,] current_board = new Piece[8, 8];   
+    [SerializeField] private GameObject pieceObject; 
+    [SerializeField] private AudioSource pieceMoveSound;
+    private List<Piece[,]> _boardHistory = new();
+    private Piece[,] _currentBoard = new Piece[8, 8];
 
-    void Start()
+    private void Start()
     {
-        currentPlayer = Piece.Color.White;
-        piece_move_sound.Play();
-        CreateAndSetupPiece(Piece.PieceType.King, Piece.Color.White, 1, 5);
-        CreateAndSetupPiece(Piece.PieceType.Queen, Piece.Color.White, 1, 4);
-        CreateAndSetupPiece(Piece.PieceType.Bishop, Piece.Color.White, 1, 6);
-        CreateAndSetupPiece(Piece.PieceType.Bishop, Piece.Color.White, 1, 3);
-        CreateAndSetupPiece(Piece.PieceType.Knight, Piece.Color.White, 1, 7);
-        CreateAndSetupPiece(Piece.PieceType.Knight, Piece.Color.White, 1, 2);
-        CreateAndSetupPiece(Piece.PieceType.Rook, Piece.Color.White, 1, 8);
-        CreateAndSetupPiece(Piece.PieceType.Rook, Piece.Color.White, 1, 1);
+        pieceMoveSound.Play();
+        CreateAndSetupPiece(Piece.Type.King, Piece.Color.White, 1, 5);
+        CreateAndSetupPiece(Piece.Type.Queen, Piece.Color.White, 1, 4);
+        CreateAndSetupPiece(Piece.Type.Bishop, Piece.Color.White, 1, 6);
+        CreateAndSetupPiece(Piece.Type.Bishop, Piece.Color.White, 1, 3);
+        CreateAndSetupPiece(Piece.Type.Knight, Piece.Color.White, 1, 7);
+        CreateAndSetupPiece(Piece.Type.Knight, Piece.Color.White, 1, 2);
+        CreateAndSetupPiece(Piece.Type.Rook, Piece.Color.White, 1, 8);
+        CreateAndSetupPiece(Piece.Type.Rook, Piece.Color.White, 1, 1);
         for (int i = 1; i <= 8; i++)
         {
-            CreateAndSetupPiece(Piece.PieceType.Pawn, Piece.Color.White, 2, i);
+            CreateAndSetupPiece(Piece.Type.Pawn, Piece.Color.White, 2, i);
         }
 
-        CreateAndSetupPiece(Piece.PieceType.King, Piece.Color.Black, 8, 5);
-        CreateAndSetupPiece(Piece.PieceType.Queen, Piece.Color.Black, 8, 4);
-        CreateAndSetupPiece(Piece.PieceType.Bishop, Piece.Color.Black, 8, 6);
-        CreateAndSetupPiece(Piece.PieceType.Bishop, Piece.Color.Black, 8, 3);
-        CreateAndSetupPiece(Piece.PieceType.Knight, Piece.Color.Black, 8, 7);
-        CreateAndSetupPiece(Piece.PieceType.Knight, Piece.Color.Black, 8, 2);
-        CreateAndSetupPiece(Piece.PieceType.Rook, Piece.Color.Black, 8, 8);
-        CreateAndSetupPiece(Piece.PieceType.Rook, Piece.Color.Black, 8, 1);
+        CreateAndSetupPiece(Piece.Type.King, Piece.Color.Black, 8, 5);
+        CreateAndSetupPiece(Piece.Type.Queen, Piece.Color.Black, 8, 4);
+        CreateAndSetupPiece(Piece.Type.Bishop, Piece.Color.Black, 8, 6);
+        CreateAndSetupPiece(Piece.Type.Bishop, Piece.Color.Black, 8, 3);
+        CreateAndSetupPiece(Piece.Type.Knight, Piece.Color.Black, 8, 7);
+        CreateAndSetupPiece(Piece.Type.Knight, Piece.Color.Black, 8, 2);
+        CreateAndSetupPiece(Piece.Type.Rook, Piece.Color.Black, 8, 8);
+        CreateAndSetupPiece(Piece.Type.Rook, Piece.Color.Black, 8, 1);
         for (int i = 1; i <= 8; i++)
         {
-            CreateAndSetupPiece(Piece.PieceType.Pawn, Piece.Color.Black, 7, i);
+            CreateAndSetupPiece(Piece.Type.Pawn, Piece.Color.Black, 7, i);
         }
         // add the current board state to the history
         // Create a deep copy of the current board
         Piece[,] boardCopy = new Piece[8, 8];
-        Array.Copy(current_board, boardCopy, current_board.Length);
-        board_history.Add(boardCopy);
+        Array.Copy(_currentBoard, boardCopy, _currentBoard.Length);
+        _boardHistory.Add(boardCopy);
     }
     
     [CanBeNull]
     private Piece GetPieceAt(int file, int rank, Piece[,] board = null)
     {
-        if (board == null)
-        {
-            return current_board[file - 1, rank - 1];
-        }
-        else
-        {
-            return board[file - 1, rank - 1];
-        }
+        return board == null ? _currentBoard[file - 1, rank - 1] : board[file - 1, rank - 1];
     }
 
     private void SetPieceAt(int file, int rank, [CanBeNull] Piece piece)
     {
-        current_board[file - 1, rank - 1] = piece;
-        piece?.SetRankAndFile(rank, file);
+        _currentBoard[file - 1, rank - 1] = piece;
+        if (piece != null)
+        {
+            piece.SetRankAndFile(rank, file);
+        }
     }
 
-    private void CreateAndSetupPiece(Piece.PieceType type, Piece.Color color, int rank, int file)
+    private void CreateAndSetupPiece(Piece.Type type, Piece.Color color, int rank, int file)
     {
-        GameObject obj = Instantiate(piece_o, new Vector3(0, 0, -1), Quaternion.identity);
+        GameObject obj = Instantiate(pieceObject, new Vector3(0, 0, -1), Quaternion.identity);
         Piece piece = obj.GetComponent<Piece>();
         piece.name = $"{color}_{type}".ToLower();
         piece.Activate(type, color, rank, file);
@@ -77,263 +71,205 @@ public class Game : MonoBehaviour
         SetPieceAt(file, rank, piece);
     }
 
-    private void OnPieceTriedMove(Piece piece, int to_rank, int to_file)
+    private void OnPieceTriedMove(Piece piece, int toRank, int toFile)
     {
         Debug.Log("Piece tried move");
         Debug.Log("Check legality");
+        bool legal = IsLegalMove(piece, toRank, toFile); 
         
-        // check position is on board
-        if (!IsOnBoard(to_rank, to_file))
-        {
-            Debug.Log("New position not on board");
-            piece.SetRankAndFile(piece.rank, piece.file);
-            return;
-        }
-
-        // check piece has moved
-        if (!PieceHasMoved(piece, to_rank, to_file))
-        {
-            Debug.Log("Piece did not move");
-            piece.SetRankAndFile(piece.rank, piece.file);
-            return;
-        }
-        
-        // check there is no ally on the target square
-        if (GetPieceAt(to_file, to_rank)?.color == piece.color)
-        {
-            Debug.Log("Square occupied by Ally Piece");
-            piece.SetRankAndFile(piece.rank, piece.file);
-            return;
-        }
-        
-        // piece specific rules
-        bool legal = true;
-        switch (piece.pieceType)
-        {
-            case Piece.PieceType.King:
-                var king_move_type = IsLegalKingMove(piece, to_rank, to_file);
-                legal &= (king_move_type != KingMoveType.Illegal);
-                if (king_move_type == KingMoveType.CastleFile1)
-                {
-                    Piece castling_rook = GetPieceAt(1, piece.rank);
-                    var new_rook_file = piece.file + Math.Sign(to_file - piece.file);
-                    SetPieceAt(new_rook_file, piece.rank, castling_rook);
-                    SetPieceAt(castling_rook.file, castling_rook.rank, null);
-                }
-                if (king_move_type == KingMoveType.CastleFile8)
-                {
-                    Piece castling_rook = GetPieceAt(8, piece.rank);
-                    var new_rook_file = piece.file + Math.Sign(to_file - piece.file);
-                    SetPieceAt(new_rook_file, piece.rank, castling_rook);
-                    SetPieceAt(castling_rook.file, castling_rook.rank, null);
-                }
-                break;
-            case Piece.PieceType.Queen:
-                legal &= IsLegalQueenMove(piece, to_rank, to_file);
-                break;
-            case Piece.PieceType.Bishop:
-                legal &= IsLegalBishopMove(piece, to_rank, to_file);
-                break;
-            case Piece.PieceType.Knight:
-                legal &= IsLegalKnightMove(piece, to_rank, to_file);
-                break;
-            case Piece.PieceType.Rook:
-                legal &= IsLegalRookMove(piece, to_rank, to_file);
-                break;
-            case Piece.PieceType.Pawn:
-                // Pawn is a special case due to pesky en Pessant move, and promotion
-                var pawn_move_type =  IsLegalPawnMove(piece, to_rank, to_file);
-                legal &= (pawn_move_type != PawnMoveType.Illegal);
-                if (pawn_move_type == PawnMoveType.EnPessant)
-                {
-                    Destroy(GetPieceAt(to_file, piece.rank).GameObject());
-                }
-                if (pawn_move_type == PawnMoveType.Promotion)
-                {
-                    Piece.PieceType promotion_piece_type = Piece.PieceType.Queen;
-                    piece.Activate(promotion_piece_type, piece.color, piece.rank, piece.file);
-                }
-                break;
-        }
-
         if (!legal)
         {
             Debug.Log("Not a legal move");
-            piece.SetRankAndFile(piece.rank, piece.file);
+            piece.SetRankAndFile(piece.Rank, piece.File);
             return;
         }
 
-        Piece square_occupant = GetPieceAt(to_file, to_rank);
-        if (square_occupant != null)
+        // handle castling
+        if (piece.PieceType == Piece.Type.King)
         {
-            Destroy(square_occupant.gameObject);
+            KingMoveType kingMoveType = IsLegalKingMove(piece, toRank, toFile);
+            if (kingMoveType == KingMoveType.Castle)
+            {
+                int rookFile = toFile - piece.File < 0 ? 1 : 8;
+                Piece castlingRook = GetPieceAt(rookFile, piece.Rank);
+                Debug.Assert(castlingRook != null, "Piece in rook position was null");
+                int newRookFile = piece.File + Math.Sign(toFile - piece.File);
+                SetPieceAt(newRookFile, piece.Rank, castlingRook);
+                SetPieceAt(castlingRook.File, castlingRook.Rank, null);
+            }
+        }
+        // handle en pessant and promotion
+        else if (piece.PieceType == Piece.Type.Pawn)
+        {
+            // Pawn is a special case due to pesky en Pessant move, and promotion
+            PawnMoveType pawnMoveType = IsLegalPawnMove(piece, toRank, toFile);
+            if (pawnMoveType == PawnMoveType.EnPessant)
+            {
+                Destroy(GetPieceAt(toFile, piece.Rank).GameObject());
+            }
+            if (pawnMoveType == PawnMoveType.Promotion)
+            {
+                // TODO: Piece Type Selection
+                Piece.Type promotionPieceType = Piece.Type.Queen;
+                piece.Activate(promotionPieceType, piece.PieceColor, piece.Rank, piece.File);
+            } 
         }
 
-        SetPieceAt(piece.file, piece.rank, null);
-        SetPieceAt(to_file, to_rank, piece);
+        Piece squareOccupant = GetPieceAt(toFile, toRank);
+        if (squareOccupant != null)
+        {
+            Destroy(squareOccupant.gameObject);
+        }
+
+        SetPieceAt(piece.File, piece.Rank, null);
+        SetPieceAt(toFile, toRank, piece);
         
-        piece_move_sound.Play();
+        pieceMoveSound.Play();
         
         // Create a deep copy of the current board
         Piece[,] boardCopy = new Piece[8, 8];
-        Array.Copy(current_board, boardCopy, current_board.Length);
-        board_history.Add(boardCopy);
+        Array.Copy(_currentBoard, boardCopy, _currentBoard.Length);
+        _boardHistory.Add(boardCopy);
         
     }
 
-    private bool IsLegalMove(Piece piece, int to_rank, int to_file)
+    private bool IsLegalMove(Piece piece, int toRank, int toFile)
     {
         // check position is on board
-        if (!IsOnBoard(to_rank, to_file))
+        if (!IsOnBoard(toRank, toFile))
         {
             Debug.Log("New position not on board");
-            piece.SetRankAndFile(piece.rank, piece.file);
+            piece.SetRankAndFile(piece.Rank, piece.File);
             return false;
         }
 
         // check piece has moved
-        if (!PieceHasMoved(piece, to_rank, to_file))
+        if (!PieceHasMoved(piece, toRank, toFile))
         {
             Debug.Log("Piece did not move");
-            piece.SetRankAndFile(piece.rank, piece.file);
+            piece.SetRankAndFile(piece.Rank, piece.File);
             return false;
         }
         
         // check there is no ally on the target square
-        if (GetPieceAt(to_file, to_rank)?.color == piece.color)
+        if (GetPieceAt(toFile, toRank)?.PieceColor == piece.PieceColor)
         {
             Debug.Log("Square occupied by Ally Piece");
-            piece.SetRankAndFile(piece.rank, piece.file);
+            piece.SetRankAndFile(piece.Rank, piece.File);
             return false;
         }
         
         // piece specific rules
         bool legal = true;
-        switch (piece.pieceType)
+        switch (piece.PieceType)
         {
-            case Piece.PieceType.King:
-                var king_move_type = IsLegalKingMove(piece, to_rank, to_file);
-                legal &= (king_move_type != KingMoveType.Illegal);
-                if (king_move_type == KingMoveType.CastleFile1)
-                {
-                    Piece castling_rook = GetPieceAt(1, piece.rank);
-                    var new_rook_file = piece.file + Math.Sign(to_file - piece.file);
-                    SetPieceAt(new_rook_file, piece.rank, castling_rook);
-                    SetPieceAt(castling_rook.file, castling_rook.rank, null);
-                }
+            case Piece.Type.King:
+                KingMoveType kingMoveType = IsLegalKingMove(piece, toRank, toFile);
+                legal &= (kingMoveType != KingMoveType.Illegal);
                 break;
-            case Piece.PieceType.Queen:
-                legal &= IsLegalQueenMove(piece, to_rank, to_file);
+            case Piece.Type.Queen:
+                legal &= IsLegalQueenMove(piece, toRank, toFile);
                 break;
-            case Piece.PieceType.Bishop:
-                legal &= IsLegalBishopMove(piece, to_rank, to_file);
+            case Piece.Type.Bishop:
+                legal &= IsLegalBishopMove(piece, toRank, toFile);
                 break;
-            case Piece.PieceType.Knight:
-                legal &= IsLegalKnightMove(piece, to_rank, to_file);
+            case Piece.Type.Knight:
+                legal &= IsLegalKnightMove(piece, toRank, toFile);
                 break;
-            case Piece.PieceType.Rook:
-                legal &= IsLegalRookMove(piece, to_rank, to_file);
+            case Piece.Type.Rook:
+                legal &= IsLegalRookMove(piece, toRank, toFile);
                 break;
-            case Piece.PieceType.Pawn:
-                // Pawn is a special case due to pesky en Pessant move, and promotion
-                var pawn_move_type =  IsLegalPawnMove(piece, to_rank, to_file);
-                legal &= (pawn_move_type != PawnMoveType.Illegal);
-                if (pawn_move_type == PawnMoveType.EnPessant)
-                {
-                    Destroy(GetPieceAt(to_file, piece.rank).GameObject());
-                }
-                if (pawn_move_type == PawnMoveType.Promotion)
-                {
-                    Piece.PieceType promotion_piece_type = Piece.PieceType.Queen;
-                    piece.Activate(promotion_piece_type, piece.color, piece.rank, piece.file);
-                }
+            case Piece.Type.Pawn:
+                PawnMoveType pawnMoveType =  IsLegalPawnMove(piece, toRank, toFile);
+                legal &= (pawnMoveType != PawnMoveType.Illegal);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
 
         return legal;
     }
 
-    private bool IsOnBoard(int to_rank, int to_file)
+    private static bool IsOnBoard(int toRank, int toFile)
     {
-        return to_rank >= 1 && to_rank <= 8 && to_file >= 1 && to_file <= 8;
+        return toRank is >= 1 and <= 8 && toFile is >= 1 and <= 8;
     }
 
-    private bool PieceHasMoved(Piece piece, int to_rank, int to_file)
+    private static bool PieceHasMoved(Piece piece, int toRank, int toFile)
     {
-        return piece.file != to_file || piece.rank != to_rank;
+        return piece.File != toFile || piece.Rank != toRank;
     }
 
     private enum KingMoveType
     {
         Normal,
-        CastleFile1,
-        CastleFile8,
+        Castle,
         Illegal
     }
 
-    private KingMoveType IsLegalKingMove(Piece king, int to_rank, int to_file)
+    private KingMoveType IsLegalKingMove(Piece king, int toRank, int toFile)
     {
-        var delta_rank = to_rank - king.rank;
-        var delta_file = to_file - king.file;
-        if (Math.Abs(delta_rank) <= 1 && Math.Abs(delta_file) <= 1)
+        int deltaRank = toRank - king.Rank;
+        int deltaFile = toFile - king.File;
+        if (Math.Abs(deltaRank) <= 1 && Math.Abs(deltaFile) <= 1)
         {
             return KingMoveType.Normal;
         }
 
         // check for castling
-        bool isTwoFileStepDown = delta_file == -2 && delta_rank == 0;
-        bool isTwoFileStepUp = delta_file == 2 && delta_rank == 0;
+        bool isTwoFileStepDown = deltaFile == -2 && deltaRank == 0;
+        bool isTwoFileStepUp = deltaFile == 2 && deltaRank == 0;
 
-        int rook_file;
+        int rookFile;
         if (isTwoFileStepDown)
         {
-            rook_file = 1;
+            rookFile = 1;
         }
         else if (isTwoFileStepUp)
         {
-            rook_file = 8;
+            rookFile = 8;
         }
         else
         {
             return KingMoveType.Illegal;
         }
 
-        Piece rook = GetPieceAt(rook_file, king.rank);
-        if (rook == null || rook.pieceType != Piece.PieceType.Rook || rook.color != king.color) 
+        Piece rook = GetPieceAt(rookFile, king.Rank);
+        if (rook == null || rook.PieceType != Piece.Type.Rook || rook.PieceColor != king.PieceColor) 
         {
             return KingMoveType.Illegal;
         }
         
         // traverse history to check that king and rook have not moved
-        bool king_has_moved = false;
-        bool rook_has_moved = false;
-        for (int i = board_history.Count - 1; i >= 0; i--)
+        bool kingHasMoved = false;
+        bool rookHasMoved = false;
+        for (int i = _boardHistory.Count - 1; i >= 0; i--)
         {
-            var rook_spot_piece = GetPieceAt(rook_file, king.rank, board_history[i]);
-            var king_spot_piece = GetPieceAt( king.file, king.rank, board_history[i]);
-            if (rook_spot_piece == null || rook_spot_piece != rook)
+            Piece rookSpotPiece = GetPieceAt(rookFile, king.Rank, _boardHistory[i]);
+            Piece kingSpotPiece = GetPieceAt( king.File, king.Rank, _boardHistory[i]);
+            if (rookSpotPiece == null || rookSpotPiece != rook)
             {
-                rook_has_moved = true;
+                rookHasMoved = true;
                 break;
             }
-            if (king_spot_piece == null || king_spot_piece != king)
+            if (kingSpotPiece == null || kingSpotPiece != king)
             {
-                king_has_moved = true;
+                kingHasMoved = true;
                 break;
             }
         }
 
-        bool king_in_check = IsSpaceThreatened(king.file, king.rank, king.color);
-        bool path_has_check = IsSpaceThreatened(king.file + Math.Sign(delta_file), king.rank, king.color);
-        bool path_is_clear = true;
+        bool kingInCheck = IsSpaceThreatened(king.File, king.Rank, king.PieceColor);
+        bool pathHasCheck = IsSpaceThreatened(king.File + Math.Sign(deltaFile), king.Rank, king.PieceColor);
+        bool pathIsClear = PathIsClear(king.Rank, king.File, toRank, toFile);
 
-        if (!rook_has_moved
-            && !king_has_moved
-            && !king_in_check
-            && !path_has_check
-            && path_is_clear)
+        if (!rookHasMoved
+            && !kingHasMoved
+            && !kingInCheck
+            && !pathHasCheck
+            && pathIsClear)
         {
-            return isTwoFileStepDown ? KingMoveType.CastleFile1 : KingMoveType.CastleFile8;
+            return KingMoveType.Castle;
         }
 
         return KingMoveType.Illegal;
@@ -341,10 +277,10 @@ public class Game : MonoBehaviour
 
     private bool IsSpaceThreatened(int file, int rank, Piece.Color color, Piece[,] board = null)
     {
-        if (board == null) board = current_board;
+        board ??= _currentBoard;
         foreach (Piece piece in board)
         {
-            if (piece == null || piece.color == color)
+            if (piece == null || piece.PieceColor == color)
             {
                 continue;
             }
@@ -356,68 +292,72 @@ public class Game : MonoBehaviour
         return false;
     }
 
-    private bool IsLegalQueenMove(Piece piece, int to_rank, int to_file)
+    private bool PathIsClear(int rank, int file, int toRank, int toFile)
     {
-        var delta_rank = to_rank - piece.rank;
-        var delta_file = to_file - piece.file;
+        int deltaRank = toRank - rank;
+        int deltaFile = toFile - file;
+        bool clear = true;
+        for (int i = 1; i < Math.Max(Math.Abs(deltaRank), Math.Abs(deltaFile)); i++)
+        {
+            clear &= (GetPieceAt(file +(i*Math.Sign(deltaFile)), rank+(i*Math.Sign(deltaRank))) == null);
+        }
+
+        return clear;
+    }
+
+    private bool IsLegalQueenMove(Piece piece, int toRank, int toFile)
+    {
+        int deltaRank = toRank - piece.Rank;
+        int deltaFile = toFile - piece.File;
         bool legal = true;
         // check is horizontal or vertical
-        if ((delta_rank != 0 && delta_file != 0)
-            && Math.Abs(delta_rank) != Math.Abs(delta_file))
+        if ((deltaRank != 0 && deltaFile != 0)
+            && Math.Abs(deltaRank) != Math.Abs(deltaFile))
         {
             return false;
         }
         // check intermediate squares are empty
-        for (int i = 1; i < Math.Max(Math.Abs(delta_rank), Math.Abs(delta_file)); i++)
-        {
-            legal &= (GetPieceAt(piece.file +(i*Math.Sign(delta_file)), piece.rank+(i*Math.Sign(delta_rank))) == null);
-        }
+        legal &= PathIsClear(piece.Rank, piece.File, toRank, toFile);
         return legal;
     }
 
-    private bool IsLegalBishopMove(Piece piece, int to_rank, int to_file)
+    private bool IsLegalBishopMove(Piece piece, int toRank, int toFile)
     {
-        var delta_rank = to_rank - piece.rank;
-        var delta_file = to_file - piece.file;
+        int deltaRank = toRank - piece.Rank;
+        int deltaFile = toFile - piece.File;
         bool legal = true;
         // check is diagonal
-        if (Math.Abs(delta_rank) != Math.Abs(delta_file))
+        if (Math.Abs(deltaRank) != Math.Abs(deltaFile))
         {
             return false;
         }
         // check squares along diagonal are empty
-        for (int i = 1; i < Math.Abs(delta_rank); i++)
-        {
-            legal &= (GetPieceAt(piece.file +(i*Math.Sign(delta_file)), piece.rank+(i*Math.Sign(delta_rank))) == null);
-        }
+        legal &= PathIsClear(piece.Rank, piece.File, toRank, toFile);
         return legal;
     }
 
-    private bool IsLegalKnightMove(Piece piece, int to_rank, int to_file)
+    private bool IsLegalKnightMove(Piece piece, int toRank, int toFile)
     {
-        var delta_rank = to_rank - piece.rank;
-        var delta_file = to_file - piece.file;
+        int deltaRank = toRank - piece.Rank;
+        int deltaFile = toFile - piece.File;
         // simply check for L shape
-        return (Math.Abs(delta_rank) == 1 && Math.Abs(delta_file) == 2)
-            || (Math.Abs(delta_file) == 1 && Math.Abs(delta_rank) == 2);
+        return (Math.Abs(deltaRank) == 1 && Math.Abs(deltaFile) == 2)
+            || (Math.Abs(deltaFile) == 1 && Math.Abs(deltaRank) == 2);
     }
 
-    private bool IsLegalRookMove(Piece piece, int to_rank, int to_file)
+    private bool IsLegalRookMove(Piece piece, int toRank, int toFile)
     {
-        var delta_rank = to_rank - piece.rank;
-        var delta_file = to_file - piece.file;
+        int deltaRank = toRank - piece.Rank;
+        int deltaFile = toFile - piece.File;
         bool legal = true;
         
         // check is horizontal or vertical
-        if (delta_rank != 0 && delta_file != 0)
+        if (deltaRank != 0 && deltaFile != 0)
         {
             return false;
         }
         // check intermediate squares are empty
-        for (int i = 1; i < Math.Max(Math.Abs(delta_rank), Math.Abs(delta_file)); i++)
-        {
-            legal &= (GetPieceAt(piece.file +(i*Math.Sign(delta_file)), piece.rank+(i*Math.Sign(delta_rank))) == null);
-        }
+        legal &= PathIsClear(piece.Rank, piece.File, toRank, toFile);
         return legal;
     }
     
@@ -431,19 +371,19 @@ public class Game : MonoBehaviour
         Promotion
     }
 
-    private PawnMoveType IsLegalPawnMove(Piece piece, int to_rank, int to_file)
+    private PawnMoveType IsLegalPawnMove(Piece piece, int toRank, int toFile)
     {
-        var delta_rank = to_rank - piece.rank;
-        var delta_file = to_file - piece.file;
+        int deltaRank = toRank - piece.Rank;
+        int deltaFile = toFile - piece.File;
 
-        if (IsNormalPawnMove(piece, to_rank, to_file, delta_rank, delta_file)
-        || IsPawnDoubleMove(piece, to_rank, to_file, delta_rank, delta_file)
-        || IsPawnAttackMove(piece, to_rank, to_file, delta_rank, delta_file))
+        if (IsNormalPawnMove(piece, toRank, toFile, deltaRank, deltaFile)
+        || IsPawnDoubleMove(piece, toRank, toFile, deltaRank, deltaFile)
+        || IsPawnAttackMove(piece, toRank, toFile, deltaRank, deltaFile))
         {
-            int promotionRank = (piece.color == Piece.Color.White) ? 8 : 1;
-            return to_rank == promotionRank ? PawnMoveType.Promotion : PawnMoveType.Normal;
+            int promotionRank = (piece.PieceColor == Piece.Color.White) ? 8 : 1;
+            return toRank == promotionRank ? PawnMoveType.Promotion : PawnMoveType.Normal;
         }
-        if (IsEnPassantMove(piece, to_rank, to_file, delta_rank, delta_file))
+        if (IsEnPassantMove(piece, toRank, toFile, deltaRank, deltaFile))
         {
             return PawnMoveType.EnPessant;
         }
@@ -451,55 +391,55 @@ public class Game : MonoBehaviour
         return PawnMoveType.Illegal;
     }
     
-    private bool IsNormalPawnMove(Piece piece, int to_rank, int to_file, int delta_rank, int delta_file)
+    private bool IsNormalPawnMove(Piece piece, int toRank, int toFile, int deltaRank, int deltaFile)
     {
-        bool isForwardMove = delta_rank == (piece.color == Piece.Color.Black ? -1 : 1);
-        bool isStraightMove = delta_file == 0;
-        bool isPathClear = GetPieceAt(to_file, to_rank) == null;
+        bool isForwardMove = deltaRank == (piece.PieceColor == Piece.Color.Black ? -1 : 1);
+        bool isStraightMove = deltaFile == 0;
+        bool isPathClear = GetPieceAt(toFile, toRank) == null;
 
         return isForwardMove && isStraightMove && isPathClear;
     }
     
-    private bool IsPawnDoubleMove(Piece piece, int to_rank, int to_file, int delta_rank, int delta_file)
+    private bool IsPawnDoubleMove(Piece piece, int toRank, int toFile, int deltaRank, int deltaFile)
     {
-        bool isStartingPosition = piece.rank == (piece.color == Piece.Color.Black ? 7 : 2);
-        bool isDoubleForwardMove = delta_rank == (piece.color == Piece.Color.Black ? -2 : 2);
-        bool isStraightMove = delta_file == 0;
-        bool isPathClear = GetPieceAt(to_file, to_rank) == null;
-        bool isIntermediateSquareClear = GetPieceAt(piece.file, piece.rank + (piece.color == Piece.Color.Black ? -1 : 1)) == null;
+        bool isStartingPosition = piece.Rank == (piece.PieceColor == Piece.Color.Black ? 7 : 2);
+        bool isDoubleForwardMove = deltaRank == (piece.PieceColor == Piece.Color.Black ? -2 : 2);
+        bool isStraightMove = deltaFile == 0;
+        bool isPathClear = GetPieceAt(toFile, toRank) == null;
+        bool isIntermediateSquareClear = GetPieceAt(piece.File, piece.Rank + (piece.PieceColor == Piece.Color.Black ? -1 : 1)) == null;
 
         return isStartingPosition && isDoubleForwardMove && isStraightMove && isPathClear && isIntermediateSquareClear;
     }
 
-    private bool IsPawnAttackMove(Piece piece, int to_rank, int to_file, int delta_rank, int delta_file)
+    private bool IsPawnAttackMove(Piece piece, int toRank, int toFile, int deltaRank, int deltaFile)
     {
-        bool isForwardMove = delta_rank == (piece.color == Piece.Color.Black ? -1 : 1);
-        bool isDiagonalMove = Math.Abs(delta_file) == 1;
-        Piece targetPiece = GetPieceAt(to_file, to_rank);
-        bool isCapturing = targetPiece != null && targetPiece.color != piece.color;
+        bool isForwardMove = deltaRank == (piece.PieceColor == Piece.Color.Black ? -1 : 1);
+        bool isDiagonalMove = Math.Abs(deltaFile) == 1;
+        Piece targetPiece = GetPieceAt(toFile, toRank);
+        bool isCapturing = targetPiece != null && targetPiece.PieceColor != piece.PieceColor;
 
         return isForwardMove && isDiagonalMove && isCapturing;
     }
     
-    private bool IsEnPassantMove(Piece piece, int to_rank, int to_file, int delta_rank, int delta_file)
+    private bool IsEnPassantMove(Piece piece, int toRank, int toFile, int deltaRank, int deltaFile)
     {
         // enPessant only possible at specific rank
-        if (piece.rank != (piece.color == Piece.Color.Black ? 4 : 5))
+        if (piece.Rank != (piece.PieceColor == Piece.Color.Black ? 4 : 5))
         {
             return false;
         }
 
-        int stepDirection = (piece.color == Piece.Color.Black) ? -1 : 1;
-        bool isForwardMove = delta_rank == stepDirection;
-        bool isSidewaysMove = Math.Abs(delta_file) == 1;
+        int stepDirection = (piece.PieceColor == Piece.Color.Black) ? -1 : 1;
+        bool isForwardMove = deltaRank == stepDirection;
+        bool isSidewaysMove = Math.Abs(deltaFile) == 1;
 
-        Piece adjacentPiece = GetPieceAt(to_file, piece.rank);
+        Piece adjacentPiece = GetPieceAt(toFile, piece.Rank);
         bool isEnemyPawnAdjacent = adjacentPiece != null 
-                                   && adjacentPiece.pieceType == Piece.PieceType.Pawn 
-                                   && adjacentPiece.color != piece.color;
+                                   && adjacentPiece.PieceType == Piece.Type.Pawn 
+                                   && adjacentPiece.PieceColor != piece.PieceColor;
         
-        int enemyPawnStartRank = piece.rank + 2 * stepDirection;
-        bool didEnemyPawnJustDoubleMove = GetPieceAt(to_file, enemyPawnStartRank, board_history[^2]) == adjacentPiece;
+        int enemyPawnStartRank = piece.Rank + 2 * stepDirection;
+        bool didEnemyPawnJustDoubleMove = GetPieceAt(toFile, enemyPawnStartRank, _boardHistory[^2]) == adjacentPiece;
         
         return isForwardMove && isSidewaysMove && isEnemyPawnAdjacent && didEnemyPawnJustDoubleMove;
     }
